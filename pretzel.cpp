@@ -7,11 +7,11 @@
 
 namespace
 {
-    std::regex braid_notation(R"(\s*(([\+\-]?\d)\s*)*)");
-    std::regex pretzel_notation(R"(\s*(([A-Za-z])\s*([\+\-]?\d)\s*)+)");
+    std::regex braid_notation(R"(\s*(([\+\-]?\d+)\s*)*)");
+    std::regex pretzel_notation(R"(\s*(([A-Za-z])\s*([\+\-]?\d+)\s*)+)");
 
-    std::regex braid_item(R"(\s*([\+\-]?\d))");
-    std::regex pretzel_item(R"(\s*([A-Za-z]?)\s*([\+\-]?\d))");
+    std::regex braid_item(R"(\s*([\+\-]?\d+))");
+    std::regex pretzel_item(R"(\s*([A-Za-z]?)\s*([\+\-]?\d+))");
 
     bool parse_int(std::string const & s, long int * out)
     {

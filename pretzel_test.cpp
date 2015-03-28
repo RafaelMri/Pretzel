@@ -28,15 +28,15 @@ void TestEdgeCases()
 
 void TestNumeric()
 {
-    pretzel pr, expected{{1, 1}, {2, 1}, {1, -1}, {3, 1}, {2, -1}};
-    EXPECT_TRUE(parse_string_as_pretzel("1 2 -1 3 -2", &pr));
+    pretzel pr, expected{{1, 1}, {2, 1}, {1, -1}, {51, 1}, {2, -1}};
+    EXPECT_TRUE(parse_string_as_pretzel("1 2 -1 51 -2", &pr));
     EXPECT_EQ(pr, expected);
 }
 
 void TestPretzel()
 {
-    pretzel pr, expected{{1, 1}, {2, -3}, {2, 1}, {1, 1}, {1, -1}};
-    EXPECT_TRUE(parse_string_as_pretzel("A1b3B1a-1a1", &pr));
+    pretzel pr, expected{{1, 1}, {2, -3}, {2, 15}, {1, 1}, {1, -1}};
+    EXPECT_TRUE(parse_string_as_pretzel("A1b3B15a-1a1", &pr));
     EXPECT_EQ(pr, expected);
 }
 
