@@ -92,6 +92,23 @@ public:
         }
     }
 
+    // Removing rows and columns is done on the matrix itself.
+    void remove_row(std::size_t r)
+    {
+        data_.erase(data_.begin() + r * cols_, data_.begin() + (r + 1) * cols_);
+        --rows_;
+    }
+    void remove_col(std::size_t c)
+    {
+        auto it = data_.begin() + c;
+        for (std::size_t i = 0; i != rows_ - 1; ++i)
+        {
+            it = data_.erase(it) + (cols_ - 1);
+        }
+        data_.erase(it);
+        --cols_;
+    }
+
     // matrix<T> operator+(const matrix<T> &) const;
     // matrix<T> operator*(const T &) const;
 

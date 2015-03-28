@@ -22,6 +22,24 @@ void TestTranspose()
             EXPECT_EQ(m(i, j), mt(j, i));
 }
 
+void TestRemove()
+{
+    matrix<double> m(2, 3);
+    m(0, 0) = 1; m(0, 1) = 2; m(0, 2) = 3;
+    m(1, 0) = 9; m(1, 1) = 8; m(1, 2) = 7;
+
+    m.remove_col(1);
+    EXPECT_EQ(m.rows(), 2u);
+    EXPECT_EQ(m.cols(), 2u);
+    EXPECT_EQ(m(0, 0), 1); EXPECT_EQ(m(0, 1), 3);
+    EXPECT_EQ(m(1, 0), 9); EXPECT_EQ(m(1, 1), 7);
+
+    m.remove_row(0);
+    EXPECT_EQ(m.rows(), 1u);
+    EXPECT_EQ(m.cols(), 2u);
+    EXPECT_EQ(m(0, 0), 9); EXPECT_EQ(m(0, 1), 7);
+}
+
 void TestVandermonde()
 {
     square_matrix<int> m = vandermonde<int>({2, 3, 5});
@@ -57,6 +75,7 @@ int main()
 {
     TestConstruct();
     TestTranspose();
+    TestRemove();
     TestVandermonde();
     TestDeterminant();
     TestGaussJordanElimination();
