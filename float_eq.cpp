@@ -33,7 +33,7 @@ bool float_eq(double a, double b, std::uint64_t ulp, std::uint64_t * ulpdiff)
     if (std::isunordered(a, b)) { return false; }
 
     // Handle +/- zero.
-    if ((a < 0 && 0 <= b) || (b < 0 && 0 <= a)) { return a == b; }
+    if (std::signbit(a) != std::signbit(b)) { return a == b; }
 
     // Handle infinity (by now, a and b must have the same sign).
     if (std::isinf(a) && std::isinf(b)) { return true; }
