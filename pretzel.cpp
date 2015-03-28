@@ -9,10 +9,12 @@
 namespace
 {
     std::regex braid_notation(R"(\s*(([\+\-]?\d+)\s*)*)");
+    std::regex simple_pretzel_notation(R"(\s*(([A-Za-z])\s*)+)");
     std::regex pretzel_notation(R"(\s*(([A-Za-z])\s*([\+\-]?\d+)\s*)+)");
 
     std::regex braid_item(R"(\s*([\+\-]?\d+))");
-    std::regex pretzel_item(R"(\s*([A-Za-z]?)\s*([\+\-]?\d+))");
+    std::regex simple_pretzel_item(R"(\s*([A-Za-z]))");
+    std::regex pretzel_item(R"(\s*([A-Za-z])\s*([\+\-]?\d+))");
 
     bool parse_int(std::string const & s, long int * out)
     {
@@ -50,6 +52,18 @@ bool parse_string_as_pretzel(std::string const & in, pretzel * out)
         {
             long int n;
             if (!parse_int(it->str(1), &n)) { return false; }
+
+            if      (n < 0) { result.emplace_back(-n, -1); }
+            else if (n > 0) { result.emplace_back(+n, +1); }
+            else            { return false;                }
+        }
+    }
+    else if (std::regex_match(in, simple_pretzel_notation))
+    {
+        for (std::sregex_iterator it(in.begin(), in.end(), simple_pretzel_item), e; it != e; ++it)
+        {
+            long int n;
+            if (!parse_letter(it->str(1), &n)) { return false; }
 
             if      (n < 0) { result.emplace_back(-n, -1); }
             else if (n > 0) { result.emplace_back(+n, +1); }

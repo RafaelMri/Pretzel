@@ -17,7 +17,7 @@ void TestEdgeCases()
     pretzel pr;
 
     // Unparsable.
-    EXPECT_FALSE(parse_string_as_pretzel("foo", &pr));
+    EXPECT_FALSE(parse_string_as_pretzel("Not 123 A 456 Pretzel", &pr));
 
     // Empty.
     EXPECT_TRUE(parse_string_as_pretzel("", &pr));
@@ -33,6 +33,13 @@ void TestNumeric()
     EXPECT_EQ(pr, expected);
 }
 
+void TestBraid()
+{
+    pretzel pr, expected{{1, 1}, {2, -1}, {1, 1}, {2, -1}};
+    EXPECT_TRUE(parse_string_as_pretzel("AbAb", &pr));
+    EXPECT_EQ(pr, expected);
+}
+
 void TestPretzel()
 {
     pretzel pr, expected{{1, 1}, {2, -3}, {2, 15}, {1, 1}, {1, -1}};
@@ -45,5 +52,6 @@ int main()
     TestPrinting();
     TestEdgeCases();
     TestNumeric();
+    TestBraid();
     TestPretzel();
 }
