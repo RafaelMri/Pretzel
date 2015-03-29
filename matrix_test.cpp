@@ -38,6 +38,10 @@ void TestRemove()
     EXPECT_EQ(m.rows(), 1u);
     EXPECT_EQ(m.cols(), 2u);
     EXPECT_EQ(m(0, 0), 9); EXPECT_EQ(m(0, 1), 7);
+
+    m.remove_row(0);
+    EXPECT_EQ(m.rows(), 0u);
+    EXPECT_EQ(m.cols(), 0u);
 }
 
 void TestScale()

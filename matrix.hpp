@@ -13,6 +13,7 @@
 #define H_MATRIX
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <initializer_list>
 #include <iosfwd>
@@ -77,6 +78,8 @@ public:
     // Swapping rows or columns is done on the matrix itself.
     void swap_rows(std::size_t r1, std::size_t r2)
     {
+        assert(r1 < rows_ && r2 < rows_);
+
         for (std::size_t j = 0; j != cols_; ++j)
         {
             using std::swap;
@@ -85,6 +88,8 @@ public:
     }
     void swap_cols(std::size_t c1, std::size_t c2)
     {
+        assert(c1 < cols_ && c2 < cols_);
+
         for (std::size_t i = 0; i != rows_; ++i)
         {
             using std::swap;
@@ -95,11 +100,16 @@ public:
     // Removing rows and columns is done on the matrix itself.
     void remove_row(std::size_t r)
     {
+        assert(r < rows_);
+
         data_.erase(data_.begin() + r * cols_, data_.begin() + (r + 1) * cols_);
         --rows_;
+        if (rows_ == 0) { cols_ = 0; assert(data_.empty()); }
     }
     void remove_col(std::size_t c)
     {
+        assert(c < cols_);
+
         auto it = data_.begin() + c;
         for (std::size_t i = 0; i != rows_ - 1; ++i)
         {
@@ -107,6 +117,7 @@ public:
         }
         data_.erase(it);
         --cols_;
+        if (cols_ == 0) { rows_ = 0; assert(data_.empty()); }
     }
 
     matrix<T> operator+(const matrix<T> & rhs) const

@@ -193,7 +193,11 @@ square_matrix<int> compute_seifert_matrix(pretzel const & pr)
     for (std::size_t i = 0, N = sm.dim(); i != N; ++i)
     {
         std::size_t const ri = N - i - 1;
-        if (homology[ri] == 0) { sm.remove_row(ri); sm.remove_col(ri); }
+        if (homology[ri] == 0)
+        {
+            if (sm.rows() != 0) { sm.remove_row(ri); }
+            if (sm.cols() != 0) { sm.remove_col(ri); }
+        }
     }
 
     return sm;
