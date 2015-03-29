@@ -67,6 +67,27 @@ std::vector<std::size_t> strand_permutations(pretzel const & pr)
     return strand_permutation;
 }
 
+std::size_t count_permutation_cycles(std::vector<std::size_t> const & permutation)
+{
+    std::vector<bool> visited(permutation.size(), false);
+    std::size_t count = 0;
+
+    for (std::size_t i = 0; i != permutation.size(); ++i)
+    {
+        if (visited[i]) { continue; }
+
+        for (std::size_t k = permutation[i] - 1; ; k = permutation[k] - 1)
+        {
+            visited[k] = true;
+            if (k == i) { break; }
+        }
+
+        ++count;
+  }
+
+  return count;
+}
+
 std::vector<std::size_t> compute_homology(pretzel const & pr)
 // The algorithm takes each crossing in turn and looks through the braid to find
 // the next crossing with the same modulus. This is because the modulus of the

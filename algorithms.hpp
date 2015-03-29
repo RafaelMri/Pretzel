@@ -27,6 +27,9 @@ void partition_twists(std::vector<std::size_t> const & missing, pretzel * pr);
 // as strand v[i -1] (the "- 1" is because our strands are 1-based).
 std::vector<std::size_t> strand_permutations(pretzel const & pr);
 
+// Count the cycles in the given permutation. Permutations are 1-based.
+std::size_t count_permutation_cycles(std::vector<std::size_t> const & permutation);
+
 // Given a braid or pretzel, this function finds the homology generators:
 // Let h = compute_homology(pr). Then the crossings pr[i] and pr[h[i] - 1]
 // are adjacent, and h[i] = 0 means there is no adjacency.

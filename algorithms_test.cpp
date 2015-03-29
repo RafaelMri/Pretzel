@@ -46,10 +46,24 @@ void TestStrandPermutations()
     EXPECT_EQ(strand_permutations(pr), expected);
 }
 
+void TestCountPermutationCycles()
+{
+    {
+        std::vector<std::size_t> perm = { 2, 4, 3, 1 }; // Cycles: [2, 4, 1], [3]
+        EXPECT_EQ(count_permutation_cycles(perm), 2u);
+    }
+
+    {
+        std::vector<std::size_t> perm = { 1 };          // Cycles: [1]
+        EXPECT_EQ(count_permutation_cycles(perm), 1u);
+    }
+}
+
 int main()
 {
     TestNumStrands();
     TestMissingStrands();
     TestPartitionTwists();
     TestStrandPermutations();
+    TestCountPermutationCycles();
 }
