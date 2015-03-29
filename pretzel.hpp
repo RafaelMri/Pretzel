@@ -35,7 +35,7 @@
 // TODO(chris): Say something about strand numbers that don't appear in the
 //     pretzel, e.g. "1 3 1 1 3" (no "2").
 //
-// The pretzel representation is a generalization of the so-called braid
+// The pretzel representation is a generalisation of the so-called braid
 // representation. A braid is a pretzel where all twists have twisting number
 // +/-1, i.e. are simple over- or under-crossings. White it is true that every
 // link has a braid representation and thus every pretzel has a corresponding
@@ -51,7 +51,7 @@ using pretzel = std::vector<twist>;
 // the parsed pretzel data. If parsing fails, returns false and *out is not
 // modified. Requires that out be dereferenceable.
 //
-// The following string representations are recognized:
+// The following string representations are recognised:
 //
 // * Braid notation: This is just a sequence of whitespace-separated, signed
 //   strand numbers, for example "2 1 5 -1 1 -2". Each number is understood as a
@@ -65,6 +65,12 @@ using pretzel = std::vector<twist>;
 //   twist "(1, 3)". (Conventionally one would only use positive numbers and use
 //   upper- and lower-case letters to indicate twist direction, but we accept
 //   any combination of case and sign.)
+//
+// * Simple pretzel notation, a.k.a. alphabetic braid notation: Like pretzel
+//   notation, but without twisting number. The twisting number is implied to be
+//   one, so "A" is "(1, 1)" and "a" is "(1, -1)". Simple pretzel notation and
+//   full pretzel notation cannot be mixed, so if any of the twists are not 1,
+//   you must specify all twists explicitly. TODO(tkoeppe): Unify the two.
 //
 // Pretzel notation is naturally limited to 27 strands (i.e. twists starting at
 // strand 1 (= A) up to 26 (= Z).
