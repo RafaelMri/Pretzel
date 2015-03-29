@@ -17,7 +17,31 @@ std::size_t number_of_strands(pretzel const & pr)
     return 1 + std::max_element(pr.begin(), pr.end())->first;
 }
 
-std::vector<std::size_t> compute_strand_permutations(pretzel const & pr)
+std::vector<std::size_t> missing_strands(pretzel const & pr)
+{
+    std::size_t num_strands = number_of_strands(pr);
+
+    std::vector<std::size_t> result;
+    std::vector<bool> have_strand(num_strands);
+    for (auto const & tw : pr) { have_strand[tw.first - 1] = true; }
+    for (std::size_t i = 0; i != num_strands - 1; ++i)
+    {
+        if (!have_strand[i]) { result.push_back(i + 1); }
+    }
+    return result;
+}
+
+void partition_twists(std::vector<std::size_t> const & missing, pretzel * pr)
+{
+    auto it = pr->begin();
+    for (std::size_t n : missing)
+    {
+        it = std::stable_partition(it, pr->end(),
+                                   [n](twist const & tw) { return tw.first < n; });
+    }
+}
+
+std::vector<std::size_t> strand_permutations(pretzel const & pr)
 // The algorithm follows each strand in turn through the braid to see where its
 // final position is. For example, if we are following strand 2 and we see a
 // crossing labelled '1', then we know that strand 2 will switch places with
