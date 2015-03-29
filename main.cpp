@@ -50,6 +50,12 @@ int main()
         std::vector<size_t> homology = compute_homology(pr);
         auto sm = compute_seifert_matrix(pr, homology);
 
+        std::vector<std::size_t> perms = strand_permutations(pr);
+        std::size_t components = count_permutation_cycles(perms);
+
+        if (components == 1) { std::cout << "The pretzel is a knot.\n"; }
+        else                 { std::cout << "The pretzel is a link with " << components << " components.\n"; }
+
         std::cout << "Seifert matrix: " << sm << "\n";
     }
 
