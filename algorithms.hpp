@@ -22,6 +22,12 @@ std::vector<std::size_t> missing_strands(pretzel const & pr);
 // computed ahead of time and provided as input.
 void partition_twists(std::vector<std::size_t> const & missing, pretzel * pr);
 
+// Returns a list of sub-ranges of disconnected sub-pretzels of "pr". Requires
+// that "pr" be partitioned according to "missing" as if by invocation of
+// "partition_twists(missing, &pr)".
+std::vector<std::pair<pretzel::const_iterator, pretzel::const_iterator>>
+group_pretzel_components(std::vector<std::size_t> const & missing, pretzel const & pr);
+
 // Given a braid or pretzel, computes its strand permutations. Let v denote the
 // result. Then v.size() == number_of_strands(pr), and incoming strand i exits
 // as strand v[i -1] (the "- 1" is because our strands are 1-based).

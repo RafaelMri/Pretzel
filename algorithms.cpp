@@ -41,6 +41,29 @@ void partition_twists(std::vector<std::size_t> const & missing, pretzel * pr)
     }
 }
 
+std::vector<std::pair<pretzel::const_iterator, pretzel::const_iterator>>
+group_pretzel_components(std::vector<std::size_t> const & missing, pretzel const & pr)
+{
+    std::vector<std::pair<pretzel::const_iterator, pretzel::const_iterator>> result;
+
+    auto mt = missing.begin(), me = missing.end();
+    auto pt1 = pr.begin(), pt2 = pt1, pe = pr.end();
+
+    do
+    {
+        if (mt == me) { pt2 = pe; }
+        while (pt2 != pe && pt2->first < *mt) { ++pt2; }
+
+        result.emplace_back(pt1, pt2);
+
+        pt1 = pt2;
+        ++mt;
+    } while (pt2 != pe);
+
+    return result;
+}
+
+
 std::vector<std::size_t> strand_permutations(pretzel const & pr)
 // The algorithm follows each strand in turn through the braid to see where its
 // final position is. For example, if we are following strand 2 and we see a

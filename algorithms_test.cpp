@@ -39,6 +39,32 @@ void TestPartitionTwists()
     EXPECT_EQ(pr, ex);
 }
 
+void TestGroupPretzelComponents()
+{
+    using V = std::vector<std::pair<pretzel::const_iterator, pretzel::const_iterator>>;
+
+    {
+        // One group
+        pretzel pr = { {1, 1}, {3, 1}, {2, 1} };
+        std::vector<std::size_t> missing = missing_strands(pr);
+        partition_twists(missing, &pr);
+
+        V groups = group_pretzel_components(missing, pr), expected({{pr.cbegin(), pr.cend()}});
+        EXPECT_TRUE(groups == expected);
+    }
+
+    {
+        // Two groups: [(1, 1), (2, 1)] and [(4, 1)]
+        pretzel pr = { {1, 1}, {4, 1}, {2, 1} };
+        std::vector<std::size_t> missing = missing_strands(pr);
+        partition_twists(missing, &pr);
+
+        auto it = pr.cbegin();
+        V groups = group_pretzel_components(missing, pr), expected({{it, it + 2}, {it + 2, it + 3}});
+        EXPECT_TRUE(groups == expected);
+    }
+}
+
 void TestStrandPermutations()
 {
     pretzel pr = { {1, 1}, {1, 1}, {1, 1} };
@@ -64,6 +90,7 @@ int main()
     TestNumStrands();
     TestMissingStrands();
     TestPartitionTwists();
+    TestGroupPretzelComponents();
     TestStrandPermutations();
     TestCountPermutationCycles();
 }
