@@ -21,6 +21,25 @@ A GNU makefile is provided for convenience.
 
 Tested on Linux with GCC 4.9.2 and Clang 3.7 (with libstdc++ and libc++).
 
+### Compile, test and run cheat sheet
+
+* To compile only the main program with GCC:
+
+        g++ -W -Wall -Wextra -pedantic -std=c++11 -O3 -s -o main main.cpp pretzel.cpp algorithms.cpp
+
+* To run all the tests:
+
+        make
+        for i in *_test; do ./$i; done
+
+ Tests should not produce errors, though they may occasionally print informative notes.
+
+* To use Clang and `libc++`:
+
+        CXX=clang++ CXXFLAGS="-stdlib=libc++ -I /usr/local/include/c++/v1" LDFLAGS="-stdlib=libc++ -L /usr/local/lib" make
+
+ You may need to add a suitable version of `libstdc++.so` to the linker flags.
+
 ### Known issues
 
 None at present. The code base is still being worked on. Please report issues
