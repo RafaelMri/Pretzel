@@ -296,31 +296,32 @@ public:
 };
 
 template <typename T, typename C>
-square_matrix<T> vandermonde(C const & data)
+matrix<T> vandermonde(std::size_t n, C const & data)
 {
     using std::begin;
     using std::end;
 
-    std::size_t n = std::distance(begin(data), end(data));
+    std::size_t m = std::distance(begin(data), end(data));
+
+    matrix<T> result(m, n);
 
     auto it = begin(data);
-    square_matrix<T> m(n);
-    for (std::size_t i = 0; i != n; ++i)
+    for (std::size_t i = 0; i != m; ++i)
     {
         for (std::size_t j = 0; j != n; ++j)
         {
-            m(i, j) = std::pow(*it, j);
+            result(i, j) = std::pow(*it, j);
         }
         ++it;
     }
 
-    return m;
+    return result;
 }
 
 template <typename T>
-square_matrix<T> vandermonde(std::initializer_list<T> il)
+matrix<T> vandermonde(std::size_t n, std::initializer_list<T> il)
 {
-    return vandermonde<T, std::initializer_list<T>>(il);
+    return vandermonde<T, std::initializer_list<T>>(n, il);
 }
 
 #endif

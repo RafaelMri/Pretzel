@@ -42,10 +42,10 @@ void TestRemove()
 
 void TestVandermonde()
 {
-    square_matrix<int> m = vandermonde<int>({2, 3, 5});
-    EXPECT_EQ(m(1, 0), 1);
-    EXPECT_EQ(m(1, 1), 3);
-    EXPECT_EQ(m(1, 2), 9);
+    matrix<int> m = vandermonde(3, {2, 3});
+    for (std::size_t i = 0; i != 2; ++i) { EXPECT_EQ(m(i, 0), 1); }
+    EXPECT_EQ(m(0, 1), 2); EXPECT_EQ(m(0, 2), 4);
+    EXPECT_EQ(m(1, 1), 3); EXPECT_EQ(m(1, 2), 9);
 }
 
 void TestDeterminant()
