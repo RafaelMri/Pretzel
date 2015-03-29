@@ -99,7 +99,7 @@ std::size_t count_permutation_cycles(std::vector<std::size_t> const & permutatio
     {
         if (visited[i]) { continue; }
 
-        for (std::size_t k = permutation[i] - 1; ; k = permutation[k] - 1)
+        for (std::size_t k = permutation[i] - 1; ;k = permutation[k] - 1)
         {
             visited[k] = true;
             if (k == i) { break; }
@@ -134,9 +134,12 @@ std::vector<std::size_t> compute_homology(pretzel const & pr)
     return homology;
 }
 
-square_matrix<int> compute_seifert_matrix(pretzel const & pr,
-                                          std::vector<std::size_t> const & homology)
+square_matrix<int> compute_seifert_matrix(pretzel const & pr)
+// The algorithm follows the paper by Julia Collins ("An algorithm for computing
+// the Seifert matrix of a link from a braid representation", section 3).
 {
+    std::vector<size_t> homology = compute_homology(pr);
+
     square_matrix<int> sm(homology.size(), 0);
 
     for (std::size_t i = 0; i != homology.size(); ++i)

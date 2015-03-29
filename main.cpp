@@ -47,11 +47,9 @@ int main()
             std::cout << "We have rearranged your pretzel accordingly: " << pr << "\n";
         }
 
-        std::vector<size_t> homology = compute_homology(pr);
-        auto sm = compute_seifert_matrix(pr, homology);
+        auto sm = compute_seifert_matrix(pr);
 
-        std::vector<std::size_t> perms = strand_permutations(pr);
-        std::size_t components = count_permutation_cycles(perms);
+        std::size_t components = count_permutation_cycles(strand_permutations(pr));
 
         if (components == 1) { std::cout << "The pretzel is a knot.\n"; }
         else                 { std::cout << "The pretzel is a link with " << components << " components.\n"; }

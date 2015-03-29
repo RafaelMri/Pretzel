@@ -41,10 +41,10 @@ std::size_t count_permutation_cycles(std::vector<std::size_t> const & permutatio
 // are adjacent, and h[i] = 0 means there is no adjacency.
 std::vector<std::size_t> compute_homology(pretzel const & pr);
 
-// Given a braid or pretzel and the set of its homology generators, compute
-// the link's Seifert matrix. The matrix is pruned, i.e. zero rows/columns
-// have already been removed.
-square_matrix<int> compute_seifert_matrix(pretzel const & pr,
-                                          std::vector<std::size_t> const & homology);
+// Given a braid or pretzel, compute the link's Seifert matrix. The matrix is
+// pruned, i.e. zero rows/columns have already been removed. The Seifert matrix
+// is derived from the homology generators of "pr" that are obtained by calling
+// compute_homology() above.
+square_matrix<int> compute_seifert_matrix(pretzel const & pr);
 
 #endif
