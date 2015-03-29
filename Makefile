@@ -1,5 +1,5 @@
-BINS := float_eq_test matrix_test pretzel_test
-SRCS := float_eq_test.cpp float_eq.cpp matrix_test.cpp pretzel_test.cpp pretzel.cpp
+BINS := main float_eq_test matrix_test pretzel_test algorithms_test
+SRCS := main.cpp float_eq_test.cpp float_eq.cpp matrix_test.cpp pretzel_test.cpp pretzel.cpp algorithms_test.cpp algorithms.cpp
 OBJS :=  $(SRCS:%.cpp=%.o)
 
 CXXFLAGS := $(CFLAGS) $(CXXFLAGS) -W -Wall -Wextra -pedantic -std=c++11 -O3
@@ -17,6 +17,9 @@ clean:
 	$(CXX) $(LDFLAGS) -o $@ $+
 
 
+algorithms_test.o: algorithms.hpp pretzel.hpp testing.hpp
+algorithms_test: algorithms.o
+algorithms.o: algorithms.hpp matrix.hpp pretzel.hpp
 
 float_eq_test.o: testing.hpp
 float_eq_test: float_eq.o
@@ -27,5 +30,6 @@ matrix_test: float_eq.o
 
 pretzel_test.o: testing.hpp
 pretzel_test: pretzel.o
-
 pretzel.o: pretzel.hpp
+
+main: pretzel.o algorithms.o
