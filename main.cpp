@@ -5,20 +5,20 @@
 #include "algorithms.hpp"
 #include "pretzel.hpp"
 
-// Compute and print analysis of a pretzel "pr". The parameter k contains the
-// number of disjoint pretzel components (i.e. disjoint components of the
-// pretzel's Seifert surface), as computed by "group_pretzel_components".
-// Typically we preprocess a given pretzel and analyse it component by
-// component, so that we always pass k = 1, but it is equally possible to
-// analyse a complete, multi-component pretzel. The genus is additive and
-// the Seifert matrix is block-additive under disjoint unions.
-void analyse_one(pretzel const & pr, std::size_t k, char const * pre = "")
+// Compute and print analysis of a pretzel "pr".  Typically we preprocess a
+// given pretzel and analyse it component by component, but it is equally
+// possible to analyse a complete, multi-component pretzel. The genus is
+// additive and the Seifert matrix is block-additive under disjoint unions.
+void analyse_one(pretzel const & pr, char const * pre = "")
 {
     // Seifert matrix.
     square_matrix<int> sm = compute_seifert_matrix(pr);
 
     // Number of connected components of the link.
     std::size_t components = count_permutation_cycles(strand_permutations(pr));
+
+    // Number of connected components of the Seifert surface.
+    std::size_t k = missing_strands(pr).size() + 1;
 
     // Genus of the Seifert surface.
     //
@@ -41,11 +41,11 @@ void analyse_one(pretzel const & pr, std::size_t k, char const * pre = "")
     assert((k + sm.dim() - components) % 2 == 0);
     std::size_t genus = (k + sm.dim() - components) / 2;
 
-    if (components == 1) { std::cout << pre << "The pretzel is a knot.\n"; }
-    else                 { std::cout << pre << "The pretzel is a link with " << components << " components.\n"; }
-
-    std::cout << pre << "Seifert matrix: " << sm << "\n"
-              << pre << "Genus: " << genus << "\n";
+    std::cout << pre << "The pretzel is a ";
+    if (components == 1) { std::cout << "knot"; }
+    else                 { std::cout << "link with " << components << " components"; }
+    std::cout << " whose Seifert surface has genus " << genus << ".\n";
+    std::cout << pre << "Seifert matrix: " << sm << "\n";
 }
 
 void analyse_pretzel(pretzel & pr)
@@ -56,10 +56,10 @@ void analyse_pretzel(pretzel & pr)
     // Disjoint connected components of the pretzel.
     auto groups = group_pretzel_components(missing, pr);
 
-    // We could also run "analyse_one(pr, groups.size())" here to print the
-    // joint data for the full pretzel, but this seems unnecessary. The
-    // interesting information comes from individual connected components of
-    // of the Seifert surface. (See comment above "analyse_one()".)
+    // We could also run "analyse_one(pr)" here to print the joint data for the
+    // full pretzel, but this seems unnecessary. The interesting information
+    // comes from individual connected components of of the Seifert surface.
+    // (See comment above "analyse_one()".)
 
     char const * indent = "";
 
@@ -75,14 +75,7 @@ void analyse_pretzel(pretzel & pr)
         std::cout << indent << "Pretzel component: ";
         print_range(std::cout, g.first, g.second);
         std::cout << '\n';
-        pretzel sub_pr;
-        if (g.first != g.second)
-        {
-            std::size_t offset = g.first->first - 1;
-            for (auto it = g.first; it != g.second; ++it)
-                sub_pr.emplace_back(it->first - offset, it->second);
-        }
-        analyse_one(sub_pr, 1, indent);
+        analyse_one(make_subpretzel(g.first, g.second), indent);
         std::cout << '\n';
     }
 }
