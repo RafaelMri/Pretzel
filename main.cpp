@@ -1,9 +1,54 @@
+#include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <numeric>
 #include <string>
 
 #include "algorithms.hpp"
+#include "polynomial_format.hpp"
 #include "pretzel.hpp"
+
+// Compute an Alexander polynomial from a Seifert matrix. Returns the list of
+// coefficients, starting at degree zero.
+std::vector<long int> alexander_poly(square_matrix<int> const & sm)
+// We compute the coefficients of the Alexander polynomial by evaluating it on
+// d + 1 points, where d == sm.dim() is its degree. Solving for the coefficients
+// can be achieved by augmenting a Vandermonde matrix of d + 1 points with a
+// column of the values at those points and performing Gauss-Jordan elimination
+// on the augmented matrix.
+//
+// Note that even though all the input values are integers, we have to perform
+// the matrix elimination with floating point numbers and round the result back
+// to the nearest integer.
+{
+    // Step 1: Set up the Vandermonde matrix (at points 0, 1, ..., d).
+    std::vector<double> points(sm.dim() + 1);
+    std::iota(points.begin(), points.end(), 0);
+    matrix<double> augmented_vandermonde = vandermonde<double>(sm.dim() + 2, points);
+
+    // Step 2: Fill in the result p(t) = det(M - t M*) at those points.
+    std::size_t last_col = augmented_vandermonde.cols() - 1;
+    square_matrix<double> am(sm); // cast to double
+    for (std::size_t i = 0; i != augmented_vandermonde.rows(); ++i)
+    {
+        augmented_vandermonde(i, last_col) = (am + am.transpose() * (-points[i])).determinant();
+    }
+
+    // Step 3: Solve the linear system by Gauss-Jordan elimination.
+    matrix<double> solution = augmented_vandermonde.gauss_jordan();
+
+    // Step 4: Obtain the resulting polynomial coefficients by rounding.
+    std::vector<long int> coeffs;
+    coeffs.reserve(sm.dim() + 1);
+    for (std::size_t i = 0; i != sm.dim() + 1; ++i)
+    {
+        std::size_t const ri = sm.dim() - i;
+        coeffs.push_back(std::lround(solution(ri, last_col)));
+    }
+
+    // Step 5: Profit.
+    return coeffs;
+}
 
 // Compute and print analysis of a pretzel "pr".  Typically we preprocess a
 // given pretzel and analyse it component by component, but it is equally
@@ -46,6 +91,19 @@ void analyse_one(pretzel const & pr, char const * pre = "")
     else                 { std::cout << "link with " << components << " components"; }
     std::cout << " whose Seifert surface has genus " << genus << ".\n";
     std::cout << pre << "Seifert matrix: " << sm << "\n";
+
+    if (k > 1)
+    {
+        std::cout << pre << "Not computing Alexander polynomial because the link "
+                            "is splittable (the Seifert surface is not connected).\n";
+    }
+    else
+    {
+        std::vector<long int> ap_coeffs = alexander_poly(sm);
+        std::cout << pre << "Alexander polynomial: p(t) = "
+                  << polynomial_to_string("t", ap_coeffs.begin(), ap_coeffs.end())
+                  << "\n";
+    }
 }
 
 void analyse_pretzel(pretzel & pr)
