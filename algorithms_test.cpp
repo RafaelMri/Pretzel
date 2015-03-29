@@ -29,6 +29,11 @@ void TestPartitionTwists()
 {
     pretzel pr = { {3, 1}, {1, 1}, {3, -1}, {4, 3}, {1, -3} };
     pretzel ex = { {1 ,1}, {1, -3}, {3, 1}, {3, -1}, {4, 3} };
+
+    pretzel pr_orig = pr;
+    partition_twists({}, &pr);
+    EXPECT_EQ(pr, pr_orig);
+
     auto m = missing_strands(pr);
     partition_twists(m, &pr);
     EXPECT_EQ(pr, ex);

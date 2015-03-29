@@ -27,4 +27,15 @@ void partition_twists(std::vector<std::size_t> const & missing, pretzel * pr);
 // as strand v[i -1] (the "- 1" is because our strands are 1-based).
 std::vector<std::size_t> strand_permutations(pretzel const & pr);
 
+// Given a braid or pretzel, this function finds the homology generators:
+// Let h = compute_homology(pr). Then the crossings pr[i] and pr[h[i] - 1]
+// are adjacent, and h[i] = 0 means there is no adjacency.
+std::vector<std::size_t> compute_homology(pretzel const & pr);
+
+// Given a braid or pretzel and the set of its homology generators, compute
+// the link's Seifert matrix. The matrix is pruned, i.e. zero rows/columns
+// have already been removed.
+square_matrix<int> compute_seifert_matrix(pretzel const & pr,
+                                          std::vector<std::size_t> const & homology);
+
 #endif

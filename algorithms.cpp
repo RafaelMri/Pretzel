@@ -66,3 +66,77 @@ std::vector<std::size_t> strand_permutations(pretzel const & pr)
 
     return strand_permutation;
 }
+
+std::vector<std::size_t> compute_homology(pretzel const & pr)
+// The algorithm takes each crossing in turn and looks through the braid to find
+// the next crossing with the same modulus. This is because the modulus of the
+// crossing tells us between which strands it lies.
+{
+    std::vector<std::size_t> homology;
+
+    if (pr.empty()) { return homology; }
+
+    homology.resize(pr.size() - 1, 0);
+
+    for (std::size_t i = 0; i != homology.size(); ++i)
+    {
+        for (std::size_t j = i; homology[i] == 0 && j < homology.size(); )
+        {
+            ++j;
+            if (pr[i].first == pr[j].first) { homology[i] = j + 1; }
+        }
+    }
+
+    return homology;
+}
+
+square_matrix<int> compute_seifert_matrix(pretzel const & pr,
+                                          std::vector<std::size_t> const & homology)
+{
+    square_matrix<int> sm(homology.size(), 0);
+
+    for (std::size_t i = 0; i != homology.size(); ++i)
+    {
+        if (!homology[i]) { continue; }
+
+        for (std::size_t j = i; j != homology.size(); ++j)
+        {
+            /* Self-linking */
+            if (i == j) { sm(i, j) = -(pr[i].second + pr[homology[i] - 1].second) / 2; }
+
+            /* See Section 3.3 case 1 */
+            else if (homology[i] > homology[j])              { /* nothing */ }
+
+            /* See Section 3.3 case 2 */
+            else if (homology[i] < j + 1)                    { /* nothing */ }
+
+            /* See Section 3.3 case 3 */
+            else if (homology[i] == j + 1)
+            {
+                sm(i, j) = (pr[j].second - 1) / 2;
+                sm(j, i) = (pr[j].second + 1) / 2;
+            }
+
+            /* See Section 3.3 case 4 */
+            else if (abs_diff(pr[i].first, pr[j].first) > 1) { /* nothing */ }
+
+            /* See Section 3.3 case 5 */
+            else if (pr[i].first == 1 + pr[j].first) { sm(j, i) = -1; }
+            else if (pr[i].first + 1 == pr[j].first) { sm(i, j) =  1; }
+
+            else
+            {
+                throw "Error in Seifert matrix algorithm";
+            }
+        }
+    }
+
+    // Remove zero rows and columns.
+    for (std::size_t i = 0, N = sm.dim(); i != N; ++i)
+    {
+        std::size_t const ri = N - i - 1;
+        if (homology[ri] == 0) { sm.remove_row(ri); sm.remove_col(ri); }
+    }
+
+    return sm;
+}
