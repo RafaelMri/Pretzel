@@ -63,6 +63,8 @@ std::string polynomial_to_string(std::string const & sym, Iter it, Iter last)
         }
     }
 
+    if (result.empty()) { result = "0"; }
+
     return result;
 }
 

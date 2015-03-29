@@ -12,6 +12,7 @@ namespace
 void TestZero()
 {
     EXPECT_EQ(polynomial_to_string("t", wrap({})), "0");
+    EXPECT_EQ(polynomial_to_string("t", wrap({0, 0, 0})), "0");
 }
 
 void TestConstant()
