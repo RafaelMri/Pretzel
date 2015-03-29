@@ -65,6 +65,12 @@ void TestGroupPretzelComponents()
     }
 }
 
+void TestMakeSubPretzel()
+{
+    pretzel pr = { {3, 1}, {3, 1}, {3, 1} }, expected = { {1, 1}, {1, 1}, {1, 1} };
+    EXPECT_EQ(make_subpretzel(pr.begin(), pr.end()), expected);
+}
+
 void TestStrandPermutations()
 {
     pretzel pr = { {1, 1}, {1, 1}, {1, 1} };
@@ -91,6 +97,7 @@ int main()
     TestMissingStrands();
     TestPartitionTwists();
     TestGroupPretzelComponents();
+    TestMakeSubPretzel();
     TestStrandPermutations();
     TestCountPermutationCycles();
 }

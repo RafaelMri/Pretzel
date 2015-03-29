@@ -24,9 +24,22 @@ void partition_twists(std::vector<std::size_t> const & missing, pretzel * pr);
 
 // Returns a list of sub-ranges of disconnected sub-pretzels of "pr". Requires
 // that "pr" be partitioned according to "missing" as if by invocation of
-// "partition_twists(missing, &pr)".
+// "partition_twists(missing, &pr)". Note that a sub-range does not constitute
+// a pretzel properly, since it retains implicit initial strands. For example
+// "BBB" is not the same as "AAA", but rather it is "AAA" plus an unknot. See
+// "make_subpretzel()" below.
 std::vector<std::pair<pretzel::const_iterator, pretzel::const_iterator>>
 group_pretzel_components(std::vector<std::size_t> const & missing, pretzel const & pr);
+
+// Turns a range of twists into a pretzel by moving all the strand numbers up so
+// that the lowest strand number is 1. If the input range was obtained from a
+// partition according to missing strands (as if by the above three algorithms),
+// then the resulting pretzel is isomorphic to the connected component cut out
+// by the range from the original pretzel.
+//
+// For example, "BBBDDD" has ranges [], [BBB], [], [DDD], but sub-pretzels [],
+// [AAA], [], [AAA].
+pretzel make_subpretzel(pretzel::const_iterator first, pretzel::const_iterator last);
 
 // Given a braid or pretzel, computes its strand permutations. Let v denote the
 // result. Then v.size() == number_of_strands(pr), and incoming strand i exits

@@ -63,6 +63,17 @@ group_pretzel_components(std::vector<std::size_t> const & missing, pretzel const
     return result;
 }
 
+pretzel make_subpretzel(pretzel::const_iterator it, pretzel::const_iterator last)
+{
+    pretzel pr;
+    if (it != last)
+    {
+        unsigned int offset = it->first - 1;
+        pr.reserve(std::distance(it, last));
+        for (; it != last; ++it) { pr.emplace_back(it->first - offset, it->second); }
+    }
+    return pr;
+}
 
 std::vector<std::size_t> strand_permutations(pretzel const & pr)
 // The algorithm follows each strand in turn through the braid to see where its
