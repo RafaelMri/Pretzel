@@ -68,7 +68,7 @@ pretzel make_subpretzel(pretzel::const_iterator it, pretzel::const_iterator last
     pretzel pr;
     if (it != last)
     {
-        unsigned int offset = it->first - 1;
+        unsigned int offset = std::min_element(it, last)->first - 1;
         pr.reserve(std::distance(it, last));
         for (; it != last; ++it) { pr.emplace_back(it->first - offset, it->second); }
     }

@@ -37,8 +37,8 @@ group_pretzel_components(std::vector<std::size_t> const & missing, pretzel const
 // then the resulting pretzel is isomorphic to the connected component cut out
 // by the range from the original pretzel.
 //
-// For example, "BBBDDD" has ranges [], [BBB], [], [DDD], but sub-pretzels [],
-// [AAA], [], [AAA].
+// For example, "BBBEDF" has ranges [], [BBB], [], [EDF], but sub-pretzels [],
+// [AAA], [], [BAC].
 pretzel make_subpretzel(pretzel::const_iterator first, pretzel::const_iterator last);
 
 // Given a braid or pretzel, computes its strand permutations. Let v denote the

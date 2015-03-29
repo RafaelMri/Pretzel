@@ -67,7 +67,7 @@ void TestGroupPretzelComponents()
 
 void TestMakeSubPretzel()
 {
-    pretzel pr = { {3, 1}, {3, 1}, {3, 1} }, expected = { {1, 1}, {1, 1}, {1, 1} };
+    pretzel pr = { {5, 1}, {3, 1}, {4, 1} }, expected = { {3, 1}, {1, 1}, {2, 1} };
     EXPECT_EQ(make_subpretzel(pr.begin(), pr.end()), expected);
 }
 
