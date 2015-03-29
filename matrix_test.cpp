@@ -40,6 +40,28 @@ void TestRemove()
     EXPECT_EQ(m(0, 0), 9); EXPECT_EQ(m(0, 1), 7);
 }
 
+void TestScale()
+{
+    matrix<int> m(2, 3);
+    m(0, 0) = 1; m(0, 1) = 2; m(0, 2) = 3;
+    m(1, 0) = 9; m(1, 1) = 8; m(1, 2) = 7;
+
+    matrix<int> m2 = m * 3;
+    EXPECT_EQ(m2(0, 0),  3); EXPECT_EQ(m2(0, 1),  6); EXPECT_EQ(m2(0, 2),  9);
+    EXPECT_EQ(m2(1, 0), 27); EXPECT_EQ(m2(1, 1), 24); EXPECT_EQ(m2(1, 2), 21);
+}
+
+void TestAdd()
+{
+    matrix<int> m(2, 3);
+    m(0, 0) = 1; m(0, 1) = 2; m(0, 2) = 3;
+    m(1, 0) = 9; m(1, 1) = 8; m(1, 2) = 7;
+
+    matrix<int> m2 = m + m + m;
+    EXPECT_EQ(m2(0, 0),  3); EXPECT_EQ(m2(0, 1),  6); EXPECT_EQ(m2(0, 2),  9);
+    EXPECT_EQ(m2(1, 0), 27); EXPECT_EQ(m2(1, 1), 24); EXPECT_EQ(m2(1, 2), 21);
+}
+
 void TestVandermonde()
 {
     matrix<int> m = vandermonde(3, {2, 3});
@@ -76,6 +98,8 @@ int main()
     TestConstruct();
     TestTranspose();
     TestRemove();
+    TestScale();
+    TestAdd();
     TestVandermonde();
     TestDeterminant();
     TestGaussJordanElimination();

@@ -51,7 +51,7 @@ private:
 public:
     template <typename S> operator matrix<S>() const
     {
-        return matrix<S>(std::vector<S>(data_.begin(), data_.end()));
+        return matrix<S>(rows_, cols_, std::vector<S>(data_.begin(), data_.end()));
     }
 
     std::size_t rows() const { return rows_; }
@@ -109,8 +109,22 @@ public:
         --cols_;
     }
 
-    // matrix<T> operator+(const matrix<T> &) const;
-    // matrix<T> operator*(const T &) const;
+    matrix<T> operator+(const matrix<T> & rhs) const
+    {
+        if (rows() != rhs.rows() || cols() != rhs.cols())
+            throw std::domain_error("Trying to add matrices of different sizes!");
+
+        std::vector<T> new_data = data_;
+        for (std::size_t i = 0; i != new_data.size(); ++i) { new_data[i] += rhs.data_[i]; }
+        return matrix(rows_, cols_, std::move(new_data));
+    }
+
+    matrix<T> operator*(const T & x) const
+    {
+        std::vector<T> new_data = data_;
+        for (T & t : new_data) { t *= x; }
+        return matrix(rows_, cols_, std::move(new_data));
+    }
 
 protected:
     std::size_t rows_;
@@ -225,34 +239,6 @@ matrix<T> matrix<T>::gauss_jordan() const
     return m;
 }
 
-// /* Matrix addition */
-// template <typename T>
-// Matrix<T> Matrix<T>::operator+(const Matrix<T> & m) const
-// {
-//   if (!(rows() == m.rows() && cols() == m.cols())) throw std::domain_error("Trying to add matrices of different dimension!");
-
-//   Matrix<T> out(rows(), cols());
-//   for (size_t i = 0; i < rows(); i++)
-//     for (size_t j = 0; j < cols(); j++)
-//       out(i, j) = (*this)(i, j) + m(i, j);
-//   return out;
-// }
-
-// /* Scaling */
-// template <typename T>
-// Matrix<T> Matrix<T>::operator*(const T & s) const
-// {
-//   Matrix<T> out(rows(), cols());
-//   for (size_t i = 0; i < rows(); i++)
-//     for (size_t j = 0; j < cols(); j++)
-//       out(i, j) = (*this)(i, j) * s;
-//   return out;
-// }
-
-
-
-
-
 template <typename T>
 class square_matrix : public matrix<T>
 {
@@ -272,16 +258,23 @@ public:
             throw std::domain_error("Trying to construct square matrix from non-square matrix!");
     }
 
+    square_matrix(matrix<T> && m)
+    : matrix<T>(std::move(m))
+    {
+        if (m.rows() != m.cols())
+            throw std::domain_error("Trying to construct square matrix from non-square matrix!");
+    }
+
     std::size_t dim() const { return this->rows(); }
 
     square_matrix transpose() const
     {
         using std::swap;
-        std::vector<T> new_data = this->data_;
+        square_matrix result(*this);
         for (std::size_t i = 0; i != dim(); ++i)
             for (std::size_t j = i + 1; j < dim(); ++j)
-                swap((*this)(i, j), (*this)(j, i));
-        return square_matrix(matrix<T>(dim(), dim(), std::move(new_data)));
+                swap(result(i, j), result(j, i));
+        return result;
     }
 
     T determinant() const
@@ -292,6 +285,16 @@ public:
         T det(1);
         for (std::size_t i = 0; i != dim(); ++i) { det *= gaussed(i, i); }
         return (swapcount % 2  ?  -det  :  det);
+    }
+
+    square_matrix operator+(square_matrix const & x) const
+    {
+        return square_matrix(static_cast<matrix<T> const *>(this)->operator+(x));
+    }
+
+    square_matrix operator*(T const & x) const
+    {
+        return square_matrix(static_cast<matrix<T> const *>(this)->operator*(x));
     }
 };
 
