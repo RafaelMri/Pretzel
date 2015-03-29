@@ -5,9 +5,16 @@
 #include "algorithms.hpp"
 #include "pretzel.hpp"
 
-void analyze_one(pretzel const & pr, std::size_t k, char const * pre = "")
+// Compute and print analysis of a pretzel "pr". The parameter k contains the
+// number of disjoint pretzel components (i.e. disjoint components of the
+// pretzel's Seifert surface), as computed by "group_pretzel_components".
+// Typically we preprocess a given pretzel and analyse it component by
+// component, so that we always pass k = 1, but it is equally possible to
+// analyse a complete, multi-component pretzel. The genus is additive and
+// the Seifert matrix is block-additive under disjoint unions.
+void analyse_one(pretzel const & pr, std::size_t k, char const * pre = "")
 {
-   // Seifert matrix.
+    // Seifert matrix.
     square_matrix<int> sm = compute_seifert_matrix(pr);
 
     // Number of connected components of the link.
@@ -41,7 +48,7 @@ void analyze_one(pretzel const & pr, std::size_t k, char const * pre = "")
               << pre << "Genus: " << genus << "\n";
 }
 
-void analyze_pretzel(pretzel & pr)
+void analyse_pretzel(pretzel & pr)
 {
     std::vector<std::size_t> missing = missing_strands(pr);
     partition_twists(missing, &pr);
@@ -49,10 +56,10 @@ void analyze_pretzel(pretzel & pr)
     // Disjoint connected components of the pretzel.
     auto groups = group_pretzel_components(missing, pr);
 
-    // We could also run "analyze_one(pr, groups.size())" here to print the
+    // We could also run "analyse_one(pr, groups.size())" here to print the
     // joint data for the full pretzel, but this seems unnecessary. The
     // interesting information comes from individual connected components of
-    // of the Seifert surface.
+    // of the Seifert surface. (See comment above "analyse_one()".)
 
     char const * indent = "";
 
@@ -75,7 +82,7 @@ void analyze_pretzel(pretzel & pr)
             for (auto it = g.first; it != g.second; ++it)
                 sub_pr.emplace_back(it->first - offset, it->second);
         }
-        analyze_one(sub_pr, 1, indent);
+        analyse_one(sub_pr, 1, indent);
         std::cout << '\n';
     }
 }
@@ -93,7 +100,7 @@ int main()
             continue;
         }
 
-        analyze_pretzel(pr);
+        analyse_pretzel(pr);
     }
 
     std::cerr << "Goodbye.\n";
