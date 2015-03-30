@@ -64,13 +64,8 @@ using pretzel = std::vector<twist>;
 //   number is taken with its negated meaning, e.g. "A3" and "a-3" are the same
 //   twist "(1, 3)". (Conventionally one would only use positive numbers and use
 //   upper- and lower-case letters to indicate twist direction, but we accept
-//   any combination of case and sign.)
-//
-// * Simple pretzel notation, a.k.a. alphabetic braid notation: Like pretzel
-//   notation, but without twisting number. The twisting number is implied to be
-//   one, so "A" is "(1, 1)" and "a" is "(1, -1)". Simple pretzel notation and
-//   full pretzel notation cannot be mixed, so if any of the twists are not 1,
-//   you must specify all twists explicitly. TODO(tkoeppe): Unify the two.
+//   any combination of case and sign.) The twist number is optional; if absent
+//   it is implied to be one (so "A" = "A1", "a" = "a1" = "A-1").
 //
 // Pretzel notation is naturally limited to 27 strands (i.e. twists starting at
 // strand 1 (= A) up to 26 (= Z).

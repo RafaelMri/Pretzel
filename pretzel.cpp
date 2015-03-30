@@ -1,6 +1,3 @@
-#include <cerrno>
-#include <cstdlib>
-#include <regex>
 #include <sstream>
 #include <string>
 
@@ -8,89 +5,81 @@
 
 namespace
 {
-    std::regex braid_notation(R"(\s*(([\+\-]?\d+)\s*)*)");
-    std::regex simple_pretzel_notation(R"(\s*(([A-Za-z])\s*)+)");
-    std::regex pretzel_notation(R"(\s*(([A-Za-z])\s*([\+\-]?\d+)\s*)+)");
-
-    std::regex braid_item(R"(\s*([\+\-]?\d+))");
-    std::regex simple_pretzel_item(R"(\s*([A-Za-z]))");
-    std::regex pretzel_item(R"(\s*([A-Za-z])\s*([\+\-]?\d+))");
-
-    bool parse_int(std::string const & s, long int * out)
+    // Note: Assuming contiguous encoding of letters :-(
+    bool parse_letter(char c, long int * out = nullptr)
     {
-        auto old_errno = errno;
-        char * e;
-        errno = 0;
-        long int result = std::strtol(s.c_str(), &e, 10);
-        if (*e != '\0' && errno != 0) { errno = old_errno; return false; }
-        *out = result;
-        errno = old_errno;
+        if ('A' <= c && c <=  'Z') { if (out) { *out = c - 'A' + 1; } return true; }
+        if ('a' <= c && c <=  'z') { if (out) { *out = 'a' - c - 1; } return true; }
+        return false;
+    }
+
+    // Add a twist in ordinary braid notation ("1 -2 1 -2" or "AbAb"); the
+    // twisting number is always +/- 1.
+    bool add_braid_twist(long int s, pretzel * out)
+    {
+        if      (s < 0) { out->emplace_back(-s, -1); return true; }
+        else if (s > 0) { out->emplace_back(+s, +1); return true; }
+        else            { return false;                           }
+    }
+
+    // Parse purely numeric input ("1 -2 1 -2", braid notation only).
+    bool numeric(std::istream & iss, pretzel * out)
+    {
+        for (long int s; iss >> s >> std::ws; )
+        {
+            if (!add_braid_twist(s, out)) { return false; }
+        }
         return true;
     }
 
-    bool parse_letter(std::string const & s, long int * out)
+    // Parse alphabetic input ("AbAb" or "A1A3a5", braid or pretzel notation).
+    bool alphabetic(std::istream & iss, pretzel * out)
     {
-        // Turn [A, Z] into [1, 26] and [a, z] into [-1, -26].
+        for (char c; iss >> c >> std::ws; )
+        {
+            long int tw, s;
+            if (!parse_letter(c, &s)) { return false; }
 
-        if (s.size() != 1) { return false; }
-        char c = s[0];
+            if (iss >> tw)
+            {
+                if (tw % 2 == 0) { return false;             }
+                if (s < 0) { s *= -1; tw *= -1; }
+                out->emplace_back(s, tw);
+            }
+            else
+            {
+                iss.clear();
+                if (!add_braid_twist(s, out)) { return false; }
+            }
+        }
+        return true;
+    }
 
-        // Assuming contiguous letters in the system's encoding.
-        if ('A' <= c && c <=  'Z')  { *out = c - 'A' + 1;  return true; }
-        if ('a' <= c && c <=  'z')  { *out = 'a' - c - 1;  return true; }
-        return false;
+    template <bool (&Parser)(std::istream &, pretzel *)>
+    bool parse(std::string const & in, pretzel * out)
+    {
+        pretzel pr;
+        std::istringstream iss(in);
+
+        if (!Parser(iss, &pr) || !iss.eof()) { return false; }
+
+        out->swap(pr);
+        return true;
     }
 }
 
 bool parse_string_as_pretzel(std::string const & in, pretzel * out)
 {
-    pretzel result;
+    std::istringstream iss(in);
+    char c;
 
-    if (std::regex_match(in, braid_notation))
-    {
-        for (std::sregex_iterator it(in.begin(), in.end(), braid_item), e; it != e; ++it)
-        {
-            long int n;
-            if (!parse_int(it->str(1), &n)) { return false; }
+    if (iss >> std::ws && iss.eof()) { pretzel().swap(*out); return true; }
 
-            if      (n < 0) { result.emplace_back(-n, -1); }
-            else if (n > 0) { result.emplace_back(+n, +1); }
-            else            { return false;                }
-        }
-    }
-    else if (std::regex_match(in, simple_pretzel_notation))
-    {
-        for (std::sregex_iterator it(in.begin(), in.end(), simple_pretzel_item), e; it != e; ++it)
-        {
-            long int n;
-            if (!parse_letter(it->str(1), &n)) { return false; }
+    if (!(iss >> c >> std::ws)) { return false; }
 
-            if      (n < 0) { result.emplace_back(-n, -1); }
-            else if (n > 0) { result.emplace_back(+n, +1); }
-            else            { return false;                }
-        }
-    }
-    else if (std::regex_match(in, pretzel_notation))
-    {
-        for (std::sregex_iterator it(in.begin(), in.end(), pretzel_item), e; it != e; ++it)
-        {
-            long int n, k;
-            if (!parse_letter(it->str(1), &n)) { return false; }
-            if (!parse_int(it->str(2), &k)) { return false; }
+    if (c == '+' || c == '-' || ('0' <= c && c <= '9')) { return parse<numeric>(in, out); }
 
-            // Twists must be odd.
-            if (k % 2 == 0) { return false; }
+    if (parse_letter(c)) { return parse<alphabetic>(in, out); }
 
-            if      (n < 0) { result.emplace_back(-n, -k); }
-            else if (n > 0) { result.emplace_back(+n, +k); }
-            else            { return false;                }
-        }
-    }
-    else
-    {
-        return false;
-    }
-
-    result.swap(*out);
-    return true;
+    return false;
 }

@@ -42,8 +42,9 @@ void TestBraid()
 
 void TestPretzel()
 {
-    pretzel pr, expected{{1, 1}, {2, -3}, {2, 15}, {1, 1}, {1, -1}};
-    EXPECT_TRUE(parse_string_as_pretzel("A1b3B15a-1a1", &pr));
+    pretzel pr, expected{{1, 1}, {2, -3}, {2, 15}, {4, 1}, {1, 1}, {4, -1}, {1, -1}};
+    //                     A1       b3      B15       D      a-1      d       a1
+    EXPECT_TRUE(parse_string_as_pretzel("A1b3B15Da-1da1", &pr));
     EXPECT_EQ(pr, expected);
 }
 
