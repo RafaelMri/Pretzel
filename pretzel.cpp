@@ -25,7 +25,7 @@ namespace
     // Parse purely numeric input ("1 -2 1 -2", braid notation only).
     bool numeric(std::istream & iss, pretzel * out)
     {
-        for (long int s; iss >> std::ws >> s; )
+        for (long int s; iss >> s; )
         {
             if (!add_braid_twist(s, out)) { return false; }
         }
@@ -35,7 +35,7 @@ namespace
     // Parse alphabetic input ("AbAb" or "A1A3a5", braid or pretzel notation).
     bool alphabetic(std::istream & iss, pretzel * out)
     {
-        for (char c; iss >> std::ws >> c; )
+        for (char c; iss >> c; )
         {
             long int tw, s;
             if (!parse_letter(c, &s)) { return false; }
