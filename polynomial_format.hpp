@@ -10,57 +10,37 @@
 template <typename Iter>
 std::string polynomial_to_string(std::string const & sym, Iter it, Iter last)
 {
-    std::string result;
-
-    if (it == last) { result = "0"; return result; }
-
     using T = typename std::iterator_traits<Iter>::value_type;
     using RI = std::reverse_iterator<Iter>;
 
+    std::string result;
     std::size_t deg = std::distance(it, last) - 1;
 
     for (RI rit(last), rlast(it); rit != rlast; ++rit, --deg)
     {
-        if (*rit == 0) { continue; }
+        T val = *rit;
 
-        if (result.empty())
+        if (val == T(0)) { continue; }
+
+        char const * prefix = "", * mult = "";
+
+        if (result.empty() && deg != 0)
         {
-            if (deg == 0)               {                  result += std::to_string(*rit); }
-            else if (deg == 1)
-            {
-                if (*rit == T(1))       {                                                                    result += sym; }
-                else if (*rit == T(-1)) { result += '-';                                                     result += sym; }
-                else                    {                  result += std::to_string(*rit);  result += " * "; result += sym; }
-            }
-            else
-            {
-                if (*rit == T(1))       {                                                                    result += sym; result += '^'; result += std::to_string(deg); }
-                else if (*rit == T(-1)) { result += '-';                                                     result += sym; result += '^'; result += std::to_string(deg); }
-                else                    {                  result += std::to_string(*rit);  result += " * "; result += sym; result += '^'; result += std::to_string(deg); }
-            }
+            if (val == T(-1)) { prefix = "-"; val = 1; }
         }
-        else
+        else if (!result.empty())
         {
-            if (deg == 0)
-            {
-                if (*rit > T(0))        { result += " + "; result += std::to_string(+*rit); }
-                else                    { result += " - "; result += std::to_string(-*rit); }
-            }
-            else if (deg == 1)
-            {
-                if      (*rit == T(+1)) { result += " + ";                                                   result += sym; }
-                else if (*rit == T(-1)) { result += " - ";                                                   result += sym; }
-                else if (*rit > T(0))   { result += " + "; result += std::to_string(+*rit); result += " * "; result += sym; }
-                else                    { result += " - "; result += std::to_string(-*rit); result += " * "; result += sym; }
-            }
-            else
-            {
-                if (*rit == T(1))       { result += " + ";                                                   result += sym; result += '^'; result += std::to_string(deg); }
-                else if (*rit == T(-1)) { result += " - ";                                                   result += sym; result += '^'; result += std::to_string(deg); }
-                else if (*rit > T(0))   { result += " + "; result += std::to_string(+*rit); result += " * "; result += sym; result += '^'; result += std::to_string(deg); }
-                else                    { result += " - "; result += std::to_string(-*rit); result += " * "; result += sym; result += '^'; result += std::to_string(deg); }
-            }
+            if (val < T(0)) { prefix = " - "; val = -val; }
+            else            { prefix = " + ";             }
         }
+
+        if (deg != 0 && val != 1) { mult = " * "; }
+
+        result += prefix;
+        if (deg == 0 || val != 1) { result += std::to_string(val);       }
+        result += mult;
+        if (deg > 0)              { result += sym;                       }
+        if (deg > 1)              { result += '^' + std::to_string(deg); }
     }
 
     if (result.empty()) { result = "0"; }

@@ -20,6 +20,7 @@ void TestConstant()
     EXPECT_EQ(polynomial_to_string("t", wrap({ 1})),  "1");
     EXPECT_EQ(polynomial_to_string("t", wrap({-1})), "-1");
     EXPECT_EQ(polynomial_to_string("t", wrap({15})), "15");
+    EXPECT_EQ(polynomial_to_string("t", wrap({-4})), "-4");
 }
 
 void TestMonic()
