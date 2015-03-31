@@ -14,6 +14,41 @@ The computed invariants are:
 * Genus of the Seifert surface.
 * Seifert matrix.
 
+### Example
+
+Compile the program (e.g. using `make`) and run `main`. You will be prompted for input. Enter
+a braid or pretzel in one of the supported notations. For example using numeric notation:
+
+    Enter braid or pretzel (send EOF to quit): 1 -2 1 -2
+
+Output:
+
+    Pretzel component: [(1, 1), (2, -1), (1, 1), (2, -1)]
+    The pretzel is a knot whose Seifert surface has genus 1.
+    Seifert matrix: [[-1, 1], [0, 1]]
+    Alexander polynomial: p(t) = -t^2 + 3 * t - 1
+
+The program echoes back the input pretzel, in `(strand, twist)` notation, and prints the
+result of the analysis. If the pretzel has multiple disconnected components, results are
+printed for each component. For example, this time using alphabetic notation:
+
+    Enter braid or pretzel (send EOF to quit): Ad3bE5AbF7
+
+Here we specified two disconnected pretzels, `AbAb` and `d3E5F7`. The program separates
+the two and analyses each one in turn:
+
+    The pretzel is a disjoint union of unrelated sub-pretzels, and we have arranged it accordingly: [(1, 1), (2, -1), (1, 1), (2, -1), (4, -3), (5, 5), (6, 7)]
+    Disjoint sub-pretzels:
+       Pretzel component: [(1, 1), (2, -1), (1, 1), (2, -1)]
+       The pretzel is a knot whose Seifert surface has genus 1.
+       Seifert matrix: [[-1, 1], [0, 1]]
+       Alexander polynomial: p(t) = -t^2 + 3 * t - 1
+
+       Pretzel component: [(4, -3), (5, 5), (6, 7)]
+       The pretzel is a knot whose Seifert surface has genus 0.
+       Seifert matrix: []
+       Alexander polynomial: p(t) = 1
+
 ### Requirements
 
 The program is written in standard C++11. It has no external requirements.
@@ -42,8 +77,11 @@ Tested on Linux with GCC 4.9.2 and Clang 3.7 (with libstdc++ and libc++).
 
 ### Known issues
 
-None at present. The code base is still being worked on. Please report issues
-and feature requests via GitHub.
+No known bugs at present. Please report issues and feature requests via GitHub or contact the people listed below.
+
+The current input parser limits the number of strands in a braid or pretzel given in alphabetic notation to 27,
+since each strand is labelled with an alphabetic letter. There is no intrinsic algorithmic or computational limit
+on the number of strands. Get in touch if you require pretzels with a larger strand number.
 
 
 ### Acknowledgements:
