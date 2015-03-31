@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "algorithms.hpp"
+#include "contract.hpp"
 
 namespace
 {
@@ -159,32 +160,32 @@ square_matrix<int> compute_seifert_matrix(pretzel const & pr)
 
         for (std::size_t j = i; j != homology.size(); ++j)
         {
-            /* Self-linking */
+            // Self-linking
             if (i == j) { sm(i, j) = -(pr[i].second + pr[homology[i] - 1].second) / 2; }
 
-            /* See Section 3.3 case 1 */
+            // See Section 3.3 case 1
             else if (homology[i] > homology[j])              { /* nothing */ }
 
-            /* See Section 3.3 case 2 */
+            // See Section 3.3 case 2
             else if (homology[i] < j + 1)                    { /* nothing */ }
 
-            /* See Section 3.3 case 3 */
+            // See Section 3.3 case 3
             else if (homology[i] == j + 1)
             {
                 sm(i, j) = (pr[j].second - 1) / 2;
                 sm(j, i) = (pr[j].second + 1) / 2;
             }
 
-            /* See Section 3.3 case 4 */
+            // See Section 3.3 case 4
             else if (abs_diff(pr[i].first, pr[j].first) > 1) { /* nothing */ }
 
-            /* See Section 3.3 case 5 */
+            // See Section 3.3 case 5
             else if (pr[i].first == 1 + pr[j].first) { sm(j, i) = -1; }
             else if (pr[i].first + 1 == pr[j].first) { sm(i, j) =  1; }
 
             else
             {
-                throw "Error in Seifert matrix algorithm";
+                CHECK(false, "Error in Seifert matrix algorithm");
             }
         }
     }

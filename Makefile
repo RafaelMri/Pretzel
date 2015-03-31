@@ -19,13 +19,13 @@ clean:
 
 algorithms_test.o: algorithms.hpp pretzel.hpp testing.hpp
 algorithms_test: algorithms.o
-algorithms.o: algorithms.hpp matrix.hpp pretzel.hpp
+algorithms.o: algorithms.hpp contract.hpp matrix.hpp pretzel.hpp
 
 float_eq_test.o: testing.hpp
 float_eq_test: float_eq.o
 float_eq.o: float_eq.hpp
 
-matrix_test.o: matrix.hpp testing.hpp
+matrix_test.o: matrix.hpp contract.hpp testing.hpp
 matrix_test: float_eq.o
 
 pretzel_test.o: pretzel.hpp testing.hpp
@@ -34,5 +34,5 @@ pretzel.o: pretzel.hpp
 
 polynomial_format_test.o: polynomial_format.hpp testing.hpp
 
-main.o: algorithms.hpp polynomial_format.hpp pretzel.hpp matrix.hpp matrix_format.hpp
+main.o: algorithms.hpp polynomial_format.hpp pretzel.hpp contract.hpp matrix.hpp matrix_format.hpp
 main: pretzel.o algorithms.o

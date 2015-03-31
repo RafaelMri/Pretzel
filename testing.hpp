@@ -13,8 +13,8 @@
 
 #include "float_eq.hpp"
 
-#define EXPECT_OP(op, A, B) do { \
-        auto && a = (A);                                              \
+#define EXPECT_OP(op, A, B) do {                                      \
+    auto && a = (A);                                                  \
     auto && b = (B);                                                  \
     if (!(a op b)) {                                                  \
         std::cout << "Expected " #A " " #op " " #B " but got: '"      \

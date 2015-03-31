@@ -15,12 +15,14 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 #include <initializer_list>
 #include <iosfwd>
 #include <iterator>
 #include <sstream>
-#include <stdexcept>
 #include <vector>
+
+#include "contract.hpp"
 
 template <typename> class square_matrix;
 
@@ -58,8 +60,8 @@ public:
     std::size_t rows() const { return rows_; }
     std::size_t cols() const { return cols_; }
 
-    T const & operator()(std::size_t i, std::size_t j) const { return data_[i * cols_ + j]; }
-    T       & operator()(std::size_t i, std::size_t j)       { return data_[i * cols_ + j]; }
+    T const & operator()(std::size_t i, std::size_t j) const { assert(i < rows_ && j < cols_); return data_[i * cols_ + j]; }
+    T       & operator()(std::size_t i, std::size_t j)       { assert(i < rows_ && j < cols_); return data_[i * cols_ + j]; }
 
     matrix transpose() const
     {
@@ -122,8 +124,7 @@ public:
 
     matrix<T> operator+(const matrix<T> & rhs) const
     {
-        if (rows() != rhs.rows() || cols() != rhs.cols())
-            throw std::domain_error("Trying to add matrices of different sizes!");
+        CHECK(rows() == rhs.rows() && cols() == rhs.cols(), "Trying to add matrices of different sizes!");
 
         std::vector<T> new_data = data_;
         for (std::size_t i = 0; i != new_data.size(); ++i) { new_data[i] += rhs.data_[i]; }
@@ -247,15 +248,13 @@ public:
     square_matrix(matrix<T> const & m)
     : matrix<T>(m)
     {
-        if (m.rows() != m.cols())
-            throw std::domain_error("Trying to construct square matrix from non-square matrix!");
+        CHECK_EQ(m.rows(), m.cols(), "Trying to construct square matrix from non-square matrix!");
     }
 
     square_matrix(matrix<T> && m)
     : matrix<T>(std::move(m))
     {
-        if (m.rows() != m.cols())
-            throw std::domain_error("Trying to construct square matrix from non-square matrix!");
+        CHECK_EQ(m.rows(), m.cols(), "Trying to construct square matrix from non-square matrix!");
     }
 
     std::size_t dim() const { return this->rows(); }
