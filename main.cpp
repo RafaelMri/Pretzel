@@ -5,6 +5,7 @@
 #include <string>
 
 #include "algorithms.hpp"
+#include "matrix_format.hpp"
 #include "polynomial_format.hpp"
 #include "pretzel.hpp"
 
@@ -89,8 +90,8 @@ void analyse_one(pretzel const & pr, char const * pre = "")
     std::cout << pre << "The pretzel is a ";
     if (components == 1) { std::cout << "knot"; }
     else                 { std::cout << "link with " << components << " components"; }
-    std::cout << " whose Seifert surface has genus " << genus << ".\n";
-    std::cout << pre << "Seifert matrix: " << sm << "\n";
+    std::cout << " whose Seifert surface has genus " << genus << ".\n"
+              << pre << "Seifert matrix: " << print_inline(sm) << "\n";
 
     if (k > 1)
     {

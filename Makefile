@@ -34,5 +34,5 @@ pretzel.o: pretzel.hpp
 
 polynomial_format_test.o: polynomial_format.hpp testing.hpp
 
-main.o: algorithms.hpp polynomial_format.hpp pretzel.hpp matrix.hpp
+main.o: algorithms.hpp polynomial_format.hpp pretzel.hpp matrix.hpp matrix_format.hpp
 main: pretzel.o algorithms.o

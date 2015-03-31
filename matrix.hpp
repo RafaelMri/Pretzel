@@ -141,24 +141,6 @@ protected:
     std::size_t rows_;
     std::size_t cols_;
     std::vector<T> data_;
-
-    template <typename CharT, typename Traits>
-    friend std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & os, matrix<T> const & m)
-    {
-        os << '[';
-        for (std::size_t i = 0; i != m.rows(); ++i)
-        {
-            os << '[';
-            for (std::size_t j = 0; j != m.cols(); ++j)
-            {
-                if (j != 0) { os << ", "; }
-                os << m(i, j);
-            }
-            os << ']';
-        }
-        os << ']';
-        return os;
-    }
 };
 
 // Gaussian elimination: returns a row-echelon form; if unit_diagonal is true, then
