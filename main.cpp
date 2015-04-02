@@ -93,6 +93,9 @@ void analyse_one(pretzel const & pr, char const * pre = "")
     std::cout << " whose Seifert surface has genus " << genus << ".\n"
               << pre << "Seifert matrix: " << print_inline(sm) << "\n";
 
+    print_pretzel(pr, std::cout, pre);
+    std::cout << '\n';
+
     if (k > 1)
     {
         std::cout << pre << "Not computing Alexander polynomial because the link "
