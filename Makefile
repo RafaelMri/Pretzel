@@ -29,8 +29,8 @@ matrix_test.o: matrix.hpp contract.hpp testing.hpp
 matrix_test: float_eq.o
 
 pretzel_test.o: pretzel.hpp testing.hpp
-pretzel_test: pretzel.o
-pretzel.o: pretzel.hpp
+pretzel_test: pretzel.o algorithms.o
+pretzel.o: pretzel.hpp algorithms.hpp
 
 polynomial_format_test.o: polynomial_format.hpp testing.hpp
 

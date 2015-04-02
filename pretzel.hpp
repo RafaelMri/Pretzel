@@ -101,4 +101,8 @@ std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits>
     return os;
 }
 
+// Pretty-print the pretzel to the given output stream, with an optional
+// per-line prefix.
+void print_pretzel(pretzel const & pr, std::ostream & os, const char * prefix = "");
+
 #endif

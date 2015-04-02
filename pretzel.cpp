@@ -1,6 +1,7 @@
 #include <sstream>
 #include <string>
 
+#include "algorithms.hpp"
 #include "pretzel.hpp"
 
 namespace
@@ -82,4 +83,56 @@ bool parse_string_as_pretzel(std::string const & in, pretzel * out)
     if (parse_letter(c)) { return parse<alphabetic>(in, out); }
 
     return false;
+}
+
+namespace
+{
+    void print_below(std::size_t i, std::size_t j, int twist, std::ostream & os)
+    {
+        bool overcross = twist > 0;
+        if (!overcross) { twist = -twist; }
+
+        char const * lines[] = { "_   _", " \\ / ", overcross ? "  \\  " : "  /  " };
+        if (twist != 1 && i == 2)
+        {
+            if      (j == 3 && 10 <= twist && twist < 100) { os << static_cast<char>('0' + twist / 10); }
+            else if (j == 4 && 10 <= twist && twist < 100) { os << static_cast<char>('0' + twist % 10); }
+            else if (j == 4 && twist < 10)                 { os << static_cast<char>('0' + twist);      }
+            else if ((j == 3 || j == 4) && 100 <= twist)   { os << '*';                                 }
+            else                                           { os << lines[i][j];                         }
+        }
+        else
+        {
+            os << lines[i][j];
+        }
+    }
+
+    void print_above(std::size_t i, std::size_t j, std::ostream & os)
+    {
+        if (i != 0) os << ' ';
+        else        os << "_/ \\_"[j];
+    }
+}
+
+void print_pretzel(pretzel const & pr, std::ostream & os, const char * prefix)
+{
+    std::size_t n = number_of_strands(pr);  // height
+    std::size_t l = 5 * pr.size();          // width
+
+    for (std::size_t i = 0; i != 3 * n - 2; ++i)
+    {
+        os << prefix;
+        for (std::size_t j = 0; j != l; ++j)
+        {
+            std::size_t s = pr[j / 5].first - 1;
+            int tw = pr[j / 5].second;
+
+            if      (s     == i / 3) { print_below(i % 3, j % 5, tw, os); }
+            else if (s + 1 == i / 3) { print_above(i % 3, j % 5, os);          }
+            else if (0     == i % 3) { os << '_';                              }
+            else                     { os << ' ';                              }
+        }
+        os << '\n';
+    }
+
 }
