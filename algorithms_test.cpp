@@ -91,6 +91,31 @@ void TestCountPermutationCycles()
     }
 }
 
+void TestSimplify()
+{
+    {
+        //                 d        C       D       B       C       B
+        pretzel pr =  { {4, -1}, {3, 1}, {4, 1}, {2, 1}, {3, 1}, {2, 1} };
+        // => dDCDBC (YB twice) => CDBC (cancel inverses) => BB (trim)
+        pretzel expected = { {2, 1}, {2, 1} };
+        EXPECT_TRUE(simplify(&pr));
+        EXPECT_EQ(pr, expected);
+    }
+    {
+        pretzel pr = { { 2, 3}, {3, 1}, {4, -5}, {3, 1}, {3, 1} };
+        pretzel expected = { {2, 1}, {2, 1}, {2, 1} };
+        EXPECT_TRUE(simplify(&pr));
+        EXPECT_EQ(pr, expected);
+    }
+}
+
+void TestNonSimplify()
+{
+    pretzel pr =  { {1, 1}, {2, -1}, {1, 1}, {2, -1} }, expected = pr;
+    EXPECT_FALSE(simplify(&pr));
+    EXPECT_EQ(pr, expected);
+}
+
 int main()
 {
     TestNumStrands();
@@ -100,4 +125,6 @@ int main()
     TestMakeSubPretzel();
     TestStrandPermutations();
     TestCountPermutationCycles();
+    TestSimplify();
+    TestNonSimplify();
 }

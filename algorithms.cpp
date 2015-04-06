@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <map>
 
 #include "algorithms.hpp"
 #include "contract.hpp"
@@ -202,4 +203,156 @@ square_matrix<int> compute_seifert_matrix(pretzel const & pr)
     }
 
     return sm;
+}
+
+
+// Pretzel simplification steps
+
+namespace
+{
+    // "CA" => "AC""
+    bool commute_distant_elements(pretzel * p)
+    {
+        auto it = std::adjacent_find(
+            p->begin(), p->end(),
+            [](twist const & a, twist const & b)
+            { return a.first > b.first + 1; });
+        if (it != p->end()) { std::iter_swap(it, std::next(it)); return true; }
+        return false;
+    }
+
+    // Remove twists from the outside of the pretzel that do not affect the link
+    // defined by the pretzel closure. Such twists are characterized by being
+    // the unique twist to contain the lowest or highest strand number. If a
+    // twist with the lowest strand number is removed, all other strand numbers
+    // are decremented by one (otherwise the pretzel would gain a disconnected
+    // unknot).
+    bool trim_lone_twists(pretzel * p)
+    {
+        std::map<unsigned int, unsigned int> twistogram;
+        for (twist const & tw : *p) { ++twistogram[tw.first]; }
+        if (twistogram.empty()) { return false; }
+
+        auto trim_fn = [](pretzel * q, unsigned int st) {
+            auto it = std::find_if(q->begin(), q->end(), [st](twist const & tw) { return tw.first == st; });
+            q->erase(it);
+        };
+
+        // Lowest strand is unique.
+        if (twistogram.begin()->second == 1)
+        {
+            trim_fn(p, twistogram.begin()->first);
+            for (auto & tw : *p) { --tw.first; }
+            return true;
+        }
+
+        // Highest strand is unique.
+        if (twistogram.rbegin()->second == 1)
+        {
+            trim_fn(p, twistogram.rbegin()->first);
+            return true;
+        }
+
+        return false;
+    }
+
+    // Find a twist (st, tw) in the range [it, last) that can be commuted to the
+    // beginning of the range; returns last if no such twist exists.
+    pretzel::iterator find_distant(unsigned int st, int tw, pretzel::iterator it, pretzel::iterator last)
+    {
+        for (; it != last; ++it)
+        {
+            if (it->first == st && it->second == tw) { return it; }
+            if (abs_diff(it->first, st) < 2) { return last; }
+        }
+
+        return last;
+    }
+
+    pretzel::iterator find_yb_triple(unsigned int st, int tw, int step, pretzel::iterator it, pretzel::iterator last);
+
+    // Determine whether a twist (st, tw) can be obtained in a position that can
+    // be commuted to the beginning of the range by applying YB relations. If no
+    // such rearrangement can be performed, returns last; otherwise performs the
+    // rearrangement and returns the iterator pointint to the newly produced ele-
+    // ment (st, tw).
+    pretzel::iterator produce_via_yb(unsigned int st, int tw, pretzel::iterator it, pretzel::iterator last)
+    {
+        // Base case
+        {
+            auto kt = find_distant(st, tw, it, last);
+            if (kt != last) { return kt; }
+        }
+
+        // Try YB above ("C" searches for "DCD")
+        {
+            auto kt = find_yb_triple(st, tw, 1, it, last);
+            if (kt != last) { return kt; }
+        }
+
+        // Try YB below ("C" searches for "BCB")
+        if (st > 1)
+        {
+            auto kt = find_yb_triple(st, tw, -1, it, last);
+            if (kt != last) { return kt; }
+        }
+
+        return last;
+    }
+
+    pretzel::iterator find_yb_triple(unsigned int st, int tw, int step, pretzel::iterator it, pretzel::iterator last)
+    {
+        auto kt1 = find_distant(st + step, tw, it, last);
+        if (kt1 != last)
+        {
+            auto kt2 = find_distant(st, tw, std::next(kt1), last);
+            if (kt2 != last)
+            {
+                auto kt3 = produce_via_yb(st + step, tw, std::next(kt2), last);
+                if (kt3 != last)
+                {
+                    std::iter_swap(kt2, kt3);
+                    *kt1 = *kt3;
+                    return kt1;
+                }
+            }
+        }
+        return last;
+    }
+
+    bool cancel_inverses(pretzel * p)
+    {
+        for (auto it = p->begin(), e = p->end(); it != e; ++it)
+        {
+            if (it->second != 1 && it->second != -1) { continue; }
+
+            // Find inverse that's adjacent after RM2 moves ("a...A")
+            {
+                auto kt = find_distant(it->first, -it->second, std::next(it), e);
+                if (kt != e) { p->erase(kt); p->erase(it); return true; }
+            }
+
+            // Find inverse that's adjacent after RM3 moves
+            {
+                auto kt = produce_via_yb(it->first, -it->second, std::next(it), e);
+                if (kt != e) { p->erase(kt); p->erase(it); return true; }
+
+            }
+        }
+
+        return false;
+    }
+}
+
+bool simplify(pretzel * p)
+{
+    bool progress = false;
+
+    while (cancel_inverses(p)) { progress = true; }
+
+    while (commute_distant_elements(p)) { progress = true; }
+
+    while (trim_lone_twists(p)) { progress = true; }
+
+    return progress;
 }

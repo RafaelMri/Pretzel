@@ -6,6 +6,23 @@
 #include "matrix.hpp"
 #include "pretzel.hpp"
 
+// Tries to reorder and reduce the pretzel *p to one that determines an isomorphic
+// link. Returns whether any modifications have been made. The resulting pretzel
+// has the following properties:
+//
+// 1. No adjacent, inverse braid group elements ("Aa" => "").
+// 2. Commuting braid group elements have the smaller element first ("CA" => "AC").
+// 3. No possible Yang-Baxter relations ("CBC" => "BCB") that enable
+//    cancellation (e.g. "bCBC" => "bBCB" => "CB").
+// 4. No isolated, unique twists at the outsides ("AbCAb" => "AbAb", "A3BcBc"
+//    => "AbAb"). (If an element is removed from the front, all remaining strand
+//    numbers are decremented by one.)
+//
+// Conditions 1-3 fix a unique representation of braid words that appear in the
+// pretzel. Condition 4 means that the pretzel does not contain any strands that
+// do not affect the resulting link.
+bool simplify(pretzel * p);
+
 // Returns the largest occurring strand number plus one; this is the number of
 // strands in the pretzel. (E.g. the simple pretzel [(1, 1)] has two strands.)
 std::size_t number_of_strands(pretzel const & pr);
