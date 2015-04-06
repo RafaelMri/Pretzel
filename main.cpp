@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -51,7 +52,7 @@ std::vector<long int> alexander_poly(square_matrix<int> const & sm)
     return coeffs;
 }
 
-// Compute and print analysis of a pretzel "pr".  Typically we preprocess a
+// Compute and print analysis of a pretzel "pr". Typically we preprocess a
 // given pretzel and analyse it component by component, but it is equally
 // possible to analyse a complete, multi-component pretzel. The genus is
 // additive and the Seifert matrix is block-additive under disjoint unions.
@@ -93,8 +94,7 @@ void analyse_one(pretzel const & pr, char const * pre = "")
     std::cout << " whose Seifert surface has genus " << genus << ".\n"
               << pre << "Seifert matrix: " << print_inline(sm) << "\n";
 
-    print_pretzel(pr, std::cout, pre);
-    std::cout << '\n';
+    if (!pr.empty()) { print_pretzel(pr, std::cout, pre); std::cout << '\n'; }
 
     if (k > 1)
     {
@@ -110,40 +110,57 @@ void analyse_one(pretzel const & pr, char const * pre = "")
     }
 }
 
-void analyse_pretzel(pretzel & pr)
+void analyse_pretzel(pretzel pr, bool do_simplify)
 {
+    bool all_simplified = do_simplify && simplify(&pr);
+
     std::vector<std::size_t> missing = missing_strands(pr);
     partition_twists(missing, &pr);
 
     // Disjoint connected components of the pretzel.
     auto groups = group_pretzel_components(missing, pr);
 
-    // We could also run "analyse_one(pr)" here to print the joint data for the
-    // full pretzel, but this seems unnecessary. The interesting information
-    // comes from individual connected components of of the Seifert surface.
-    // (See comment above "analyse_one()".)
-
     char const * indent = "";
 
-    if (!missing.empty())
+    if (all_simplified)
     {
-        std::cout << "The pretzel is a disjoint union of unrelated sub-pretzels, and we have arranged it accordingly: "
-                  << pr << "\nDisjoint sub-pretzels:\n";
+        std::cout << "The pretzel has been simplified.\n";
+    }
+    if (groups.size() > 1)
+    {
+        std::cout << "The pretzel is a disjoint union of unrelated sub-pretzels";
+        if (do_simplify) { std::cout << ".\n"; }
+        else             { std::cout << ", and we have arranged it accordingly.\n"; }
         indent = "   ";
+    }
+    if (!pr.empty() && groups.size() > 1)
+    {
+        std::cout << "Input: " << pr << '\n';
+        print_pretzel(pr, std::cout);
+        std::cout << '\n';
     }
 
     for (auto const & g : groups)
     {
-        std::cout << indent << "Pretzel component: ";
+        auto spr = make_subpretzel(g.first, g.second);
+
+        bool sub_simplified = do_simplify && simplify(&spr);
+
+        std::cout << indent << "Pretzel" << (groups.size() > 1 ? " component" : "") << ": ";
+
         print_range(std::cout, g.first, g.second);
+        if (sub_simplified) { std::cout << " Simplified: " << spr; }
         std::cout << '\n';
-        analyse_one(make_subpretzel(g.first, g.second), indent);
+
+        analyse_one(spr, indent);
         std::cout << '\n';
     }
 }
 
-int main()
+int main(int argc, char * argv[])
 {
+    bool do_simplify = argc == 2 && std::strcmp(argv[1], "-s") == 0;
+
     pretzel pr;
 
     for (std::string line;
@@ -155,7 +172,7 @@ int main()
             continue;
         }
 
-        analyse_pretzel(pr);
+        analyse_pretzel(std::move(pr), do_simplify);
     }
 
     std::cerr << "Goodbye.\n";
