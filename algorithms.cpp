@@ -221,6 +221,8 @@ namespace
         return false;
     }
 
+    pretzel::iterator find_yb_triple(unsigned int st, int tw, int step, pretzel::iterator it, pretzel::iterator last);
+
     // Remove twists from the outside of the pretzel that do not affect the link
     // defined by the pretzel closure. Such twists are characterized by being
     // the unique twist to contain the lowest or highest strand number. If a
@@ -233,24 +235,44 @@ namespace
         for (twist const & tw : *p) { ++twistogram[tw.first]; }
         if (twistogram.empty()) { return false; }
 
-        auto trim_fn = [](pretzel * q, unsigned int st) {
-            auto it = std::find_if(q->begin(), q->end(), [st](twist const & tw) { return tw.first == st; });
-            q->erase(it);
+        auto trim_finder = [](pretzel * q, unsigned int st) {
+            return std::find_if(q->begin(), q->end(), [st](twist const & tw) { return tw.first == st; });
         };
 
-        // Lowest strand is unique.
+        // Lowest twist is unique.
         if (twistogram.begin()->second == 1)
         {
-            trim_fn(p, twistogram.begin()->first);
+            p->erase(trim_finder(p, twistogram.begin()->first));
             for (auto & tw : *p) { --tw.first; }
             return true;
         }
 
-        // Highest strand is unique.
+        // Highest twist is unique.
         if (twistogram.rbegin()->second == 1)
         {
-            trim_fn(p, twistogram.rbegin()->first);
+            p->erase(trim_finder(p, twistogram.rbegin()->first));
             return true;
+        }
+
+        // Extreme strand occurs twice and is a braid twist; check whether there
+        // is a YB relation that makes the strand unique (e.g. "ZYZ" => "YZY").
+        if (twistogram.begin()->second == 2)
+        {
+            auto it = trim_finder(p, twistogram.begin()->first);
+            if (it->second == 1 || it->second == -1)
+            {
+                auto kt = find_yb_triple(it->first + 1, it->second, -1, it, p->end());
+                if (kt != p->end()) { return true; }
+            }
+        }
+        if (twistogram.rbegin()->second == 2 && twistogram.rbegin()->first > 1)
+        {
+            auto it = trim_finder(p, twistogram.rbegin()->first);
+            if (it->second == 1 || it->second == -1)
+            {
+                auto kt = find_yb_triple(it->first - 1, it->second, +1, it, p->end());
+                if (kt != p->end()) { return true; }
+            }
         }
 
         return false;
@@ -268,8 +290,6 @@ namespace
 
         return last;
     }
-
-    pretzel::iterator find_yb_triple(unsigned int st, int tw, int step, pretzel::iterator it, pretzel::iterator last);
 
     // Determine whether a twist (st, tw) can be obtained in a position that can
     // be commuted to the beginning of the range by applying YB relations. If no

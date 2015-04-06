@@ -184,8 +184,6 @@ The current input parser limits the number of strands in a braid or pretzel give
 since each strand is labelled with an alphabetic letter. There is no intrinsic algorithmic or computational limit
 on the number of strands. Get in touch if you require pretzels with a larger strand number.
 
-Simplification does not currently attempt to apply YB relations to produce isolated twists (e.g. `AbAcbc` is not simplified to `AbAbb`).
-
 The "caveat" note in the "Simplification" section describes circumstances under which simplification
 discards disconnected pretzel components.
 
